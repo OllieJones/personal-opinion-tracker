@@ -69,7 +69,7 @@ class Issue {
 				'show_in_admin_bar' => false,
 				'show_in_rest' => false, /* No block editor support */
 				'menu_position' => 90,
-				'menu_icon' => 'dashicons-document',
+				'menu_icon' => 'dashicons-media-document',
 				'map_meta_cap' => true,
 				'supports' => array(
 					'title',

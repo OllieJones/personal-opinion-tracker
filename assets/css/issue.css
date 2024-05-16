@@ -1,0 +1,8 @@
+table.issue {
+    border-spacing: 1em;
+}
+
+table.issue > tbody > tr > td:first-of-type {
+    text-align: right;
+    vertical-align: top;
+}

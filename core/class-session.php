@@ -2,6 +2,7 @@
 
 namespace Personal_Opinion_Tracker;
 
+use WP_Post;
 use WP_Query;
 
 class Session {
@@ -13,7 +14,8 @@ class Session {
 		$this->core = $core;
 
 		add_action( 'init', [ $this, 'register_post_type' ] );
-
+		add_action( 'edit_post' . '_' . self::$slug, [ $this, 'save_metadata' ], 10, 2 );
+		add_filter( 'the_title', [ $this, 'the_title' ], 10, 2 );
 
 	}
 
@@ -21,17 +23,18 @@ class Session {
 		$result = array();
 		global $post;
 		$status = array( 'publish' );
-		if ( ! $exclude_historical ) {
-			$status[] = 'historical';
-		}
-		$args  = array(
+		$args   = array(
 			'post_type'   => self::$slug,
 			'post_status' => $status
 		);
-		$query = new WP_Query( $args );
+		$query  = new WP_Query( $args );
 		while ( $query->have_posts() ) {
 			$query->the_post();
-			$result[ $post->post_name ] = $post->post_title;
+			$historical = '' !== get_post_meta( $post->ID, self::$slug . '-historical', true );
+			if ( ! $exclude_historical || ! $historical ) {
+				$title = get_the_title($post->ID);
+				$result[ $post->post_name ] = $title;
+			}
 		}
 		wp_reset_postdata();
 		asort( $result );
@@ -111,16 +114,97 @@ class Session {
 		);
 	}
 
+	/**
+     *  Filter the titles of "session" items to append (Historical) when they're no longer current
+     *
+	 * @param string $title
+	 * @param int $post_id
+	 *
+	 * @return string
+	 */
+	public function the_title( string $title, int $post_id ): string {
+        if (self::$slug === get_post_type($post_id)) {
+	        $historical = '' !== get_post_meta( $post_id, self::$slug . '-historical', true );
+	        if ( $historical ) {
+		        return $title . ' ' . __( '(Historical)', 'personal-opinion-tracker' );
+	        }
+        }
+
+		return $title;
+	}
+
 	public function make_meta_boxes( $post ) {
-		wp_enqueue_style( 'issue',
-			$this->core->url . 'assets/css/issue.css',
-			[],
-			$this->core->version );
 
 		wp_enqueue_script( 'issue',
 			$this->core->url . 'assets/js/issue.js',
 			[],
 			$this->core->version );
+
+		add_meta_box(
+			'issue',
+			__( 'This session', 'personal-opinion-tracker' ),
+			array( $this, 'session_meta_box' ),
+			null,
+			'normal', /* advanced|normal|side */
+			'high',
+			null
+		);
+
+	}
+
+	public function session_meta_box( $post, $callback_args ) {
+		$historical = '' !== get_post_meta( $post->ID, self::$slug . '-historical', true );
+		?>
+        <table class="issue">
+            <tr>
+                <td>
+                    <label for="historical"><?php esc_html_e( 'This session is', 'personal-opinion-tracker' ) ?></label>
+                </td>
+                <td>
+                    <select id="historical" name="historical">
+						<?php
+						$selected = $historical ? '' : 'selected';
+						echo '<option value="" ' . $selected . '>' . esc_html__( 'Active', 'personal-opinion-tracker' ) . '</option>' . PHP_EOL;
+						$selected = $historical ? 'selected' : '';
+						echo '<option value="historical" ' . $selected . '>' . esc_html__( 'Historical', 'personal-opinion-tracker' ) . '</option>' . PHP_EOL;
+						?>
+                    </select>
+                </td>
+            </tr>
+        </table>
+		<?php
+	}
+
+	/**
+	 * Fires once a post has been saved.
+	 *
+	 * The dynamic portion of the hook name, `$post->post_type`, refers to
+	 * the post type slug.
+	 *
+	 * @param int $profile_id Post ID.
+	 * @param WP_Post $post Post object.
+	 *
+	 * @since 3.7.0
+	 *
+	 */
+
+	public function save_metadata( $post_id, $post ) {
+
+		if ( isset ( $_POST['action'] ) && 'editpost' !== $_POST['action'] ) {
+			return;
+		}
+		if ( self::$slug !== $post->post_type ) {
+			return;
+		}
+		if ( ! $post_id ) {
+			return;
+		}
+		$historical = array_key_exists( 'historical', $_POST ) ? $_POST['historical'] : null;
+		if ( null === $historical || '' === $historical ) {
+			delete_post_meta( $post_id, self::$slug . '-historical' );
+		} else {
+			update_post_meta( $post_id, self::$slug . '-historical', $historical );
+		}
 	}
 
 }

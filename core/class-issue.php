@@ -33,7 +33,7 @@ class Issue {
 		$this->core = $core;
 
 		add_action( 'init', [ $this, 'register_post_type' ] );
-		add_action( 'edit_post' . '_' . self::$slug, [ $this, 'save_metadata' ], 10, 3 );
+		add_action( 'edit_post' . '_' . self::$slug, [ $this, 'save_metadata' ], 10, 2 );
 
 	}
 
@@ -133,7 +133,7 @@ class Issue {
 	}
 
 	public function issue_meta_box( $post, $callback_args ) {
-		$sessions       = Session::enumerate();
+		$sessions       = Session::enumerate( false );
 		$session_choice = get_post_meta( $post->ID, $this->core->slug . '-session', true );
 		$parties        = Party::enumerate();
 		$supports       = array();

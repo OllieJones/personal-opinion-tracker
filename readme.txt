@@ -1,5 +1,5 @@
 === Plugin Name ===
-Contributors: OllieJones,
+Contributors: OllieJones,Kyouhen
 Donate link: https://profiles.wordpress.org/olliejones/
 Tags: legislation, politics, opinion, ratings
 Requires at least: 6.2

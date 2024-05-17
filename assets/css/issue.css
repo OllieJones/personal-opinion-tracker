@@ -1,5 +1,9 @@
-table.issue {
-    border-spacing: 1em;
+table.issue > tbody > tr.header > td {
+    font-weight: 600;
+}
+
+table.issue > tbody > tr > td.center {
+    text-align: center;
 }
 
 table.issue > tbody > tr > td:first-of-type {

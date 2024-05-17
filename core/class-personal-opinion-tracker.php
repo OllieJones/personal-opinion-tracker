@@ -89,6 +89,10 @@ class Personal_Opinion_Tracker {
 	private function admin() {
 		require_once $this->base . 'core/class-issue.php';
 		new Issue( $this );
+		require_once $this->base . 'core/class-party.php';
+		new Party( $this );
+		require_once $this->base . 'core/class-session.php';
+		new Session( $this );
 
 	}
 

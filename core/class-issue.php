@@ -2,17 +2,38 @@
 
 namespace Personal_Opinion_Tracker;
 
+use WP_Post;
+use WP_Query;
+
 class Issue {
 
 	private Personal_Opinion_Tracker $core;
-	private string $slug;
+	public static string $slug = 'opinion-issue';
 
-	public function __construct (  $core ) {
+	public static function enumerate() {
+		$result = array();
+		global $post;
+		$args  = array(
+			'post_type'   => self::$slug,
+			'post_status' => 'publish'
+		);
+		$query = new WP_Query( $args );
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			$result[ $post->post_name ] = $post->post_title;
+		}
+		wp_reset_postdata();
+		asort( $result );
+
+		return $result;
+	}
+
+
+	public function __construct( $core ) {
 		$this->core = $core;
-		$this->slug = 'opinion-issue';
 
 		add_action( 'init', [ $this, 'register_post_type' ] );
-
+		add_action( 'edit_post' . '_' . self::$slug, [ $this, 'save_metadata' ], 10, 3 );
 
 	}
 
@@ -24,75 +45,70 @@ class Issue {
 	 * @return void
 	 *
 	 */
-	public function register_post_type()
-	{
-		/** @noinspection SqlNoDataSourceInspection */
+	public function register_post_type() {
 		register_post_type(
-			$this->slug,
+			self::$slug,
 			array(
-				'name' => __( 'Issue', 'personal-opinion-tracker' ),
-				'description' => __( 'Issues', 'personal-opinion-tracker' ),
-				'labels' => array(
-					'menu_name' => _x( 'Issues', 'post type menu name', 'personal-opinion-tracker' ),
-					'name' => _x( 'Issues', 'post type general name', 'personal-opinion-tracker' ),
-					'singular_name' => _x( 'Issue', 'post type singular name', 'personal-opinion-tracker' ),
-					'add_new' => _x( 'Add New', 'issue', 'personal-opinion-tracker' ),
-					'add_new_item' => __( 'Add new issue', 'personal-opinion-tracker' ),
-					'new_item' => __( 'New issue', 'personal-opinion-tracker' ),
-					'edit_item' => __( 'Edit issue', 'personal-opinion-tracker' ),
-					'view_item' => __( 'View issue', 'personal-opinion-tracker' ),
-					'all_items' => __( 'All issues', 'personal-opinion-tracker' ),
-					'search_items' => __( 'Search issues', 'personal-opinion-tracker' ),
-					'parent_item_colon' => __( ':', 'personal-opinion-tracker' ),
-					'not_found' => __( 'No issues found. Create one.', 'personal-opinion-tracker' ),
-					'not_found_in_trash' => __( 'No issues found in Trash.', 'personal-opinion-tracker' ),
-					'archives' => __( 'Archive of issues', 'personal-opinion-tracker' ),
-					'insert_into_item' => __( 'Insert into issu', 'personal-opinion-tracker' ),
-					'uploaded_to_this_item' => __( 'Uploaded to this issue', 'personal-opinion-tracker' ),
-					'filter_items_list' => __( 'Filter issues list', 'personal-opinion-tracker' ),
-					'items_list_navigation' => __( 'Issue list navigation', 'personal-opinion-tracker' ),
-					'items_list' => __( 'Issue list', 'personal-opinion-tracker' ),
-					'item_published' => __( 'Issue published', 'personal-opinion-tracker' ),
+				'name'                 => __( 'Issue', 'personal-opinion-tracker' ),
+				'description'          => __( 'Issues', 'personal-opinion-tracker' ),
+				'labels'               => array(
+					'menu_name'                => _x( 'Issues', 'post type menu name', 'personal-opinion-tracker' ),
+					'name'                     => _x( 'Issues', 'post type general name', 'personal-opinion-tracker' ),
+					'singular_name'            => _x( 'Issue', 'post type singular name', 'personal-opinion-tracker' ),
+					'add_new'                  => _x( 'Add New', 'issue', 'personal-opinion-tracker' ),
+					'add_new_item'             => __( 'Add new issue', 'personal-opinion-tracker' ),
+					'new_item'                 => __( 'New issue', 'personal-opinion-tracker' ),
+					'edit_item'                => __( 'Edit issue', 'personal-opinion-tracker' ),
+					'view_item'                => __( 'View issue', 'personal-opinion-tracker' ),
+					'all_items'                => __( 'All issues', 'personal-opinion-tracker' ),
+					'search_items'             => __( 'Search issues', 'personal-opinion-tracker' ),
+					'not_found'                => __( 'No issues found. Create one.', 'personal-opinion-tracker' ),
+					'not_found_in_trash'       => __( 'No issues found in Trash.', 'personal-opinion-tracker' ),
+					'archives'                 => __( 'Archive of issues', 'personal-opinion-tracker' ),
+					'insert_into_item'         => __( 'Insert into issu', 'personal-opinion-tracker' ),
+					'uploaded_to_this_item'    => __( 'Uploaded to this issue', 'personal-opinion-tracker' ),
+					'filter_items_list'        => __( 'Filter issues list', 'personal-opinion-tracker' ),
+					'items_list_navigation'    => __( 'Issue list navigation', 'personal-opinion-tracker' ),
+					'items_list'               => __( 'Issue list', 'personal-opinion-tracker' ),
+					'item_published'           => __( 'Issue published', 'personal-opinion-tracker' ),
 					'item_published_privately' => __( 'Private issue activated', 'personal-opinion-tracker' ),
-					'item_reverted_to_draft' => __( 'Issuue deactivated', 'personal-opinion-tracker' ),
-					'item_scheduled' => __( 'Issue scheduled for activation', 'personal-opinion-tracker' ),
-					'item_update' => __( 'Issue updated', 'personal-opinion-tracker' ),
+					'item_reverted_to_draft'   => __( 'Issuue deactivated', 'personal-opinion-tracker' ),
+					'item_scheduled'           => __( 'Issue scheduled for activation', 'personal-opinion-tracker' ),
+					'item_updated'              => __( 'Issue updated', 'personal-opinion-tracker' ),
 
 				),
-				'hierarchical' => false,
-				'public' => true, //TODO not sure how these visibility parameters interact.
-				'exclude_from_search' => true,
-				'publicly_queryable' => false,
-				'show_ui' => true,
-				'show_in_menu' => true, //TODO change this to put ui in submenu
-				'show_in_nav_menus' => false,
-				'show_in_admin_bar' => false,
-				'show_in_rest' => false, /* No block editor support */
-				'menu_position' => 90,
-				'menu_icon' => 'dashicons-media-document',
-				'map_meta_cap' => true,
-				'supports' => array(
+				'hierarchical'         => false,
+				'public'               => true, //TODO not sure how these visibility parameters interact.
+				'exclude_from_search'  => true,
+				'publicly_queryable'   => false,
+				'show_ui'              => true,
+				'show_in_menu'         => true, //TODO change this to put ui in submenu
+				'show_in_nav_menus'    => false,
+				'show_in_admin_bar'    => false,
+				'show_in_rest'         => false, /* No block editor support */
+				'menu_position'        => 38,
+				'menu_icon'            => 'dashicons-media-document',
+				'map_meta_cap'         => true,
+				'supports'             => array(
 					'title',
 					'editor',
 					'revisions',
 					'author',
 					'custom_fields',
 				),
-				'taxonomies' => array( 'category', 'post_tag' ),
 				'register_meta_box_cb' => [ $this, 'make_meta_boxes' ],
-				'has_archive' => true,
-				'rewrite' => array( 'slug' => $this->slug ),
-				'query_var' => $this->slug,
-				'can_export' => true,
-				'delete_with_user' => false,
-				'template' => array(),
+				'has_archive'          => true,
+				'rewrite'              => array( 'slug' => self::$slug ),
+				'query_var'            => self::$slug,
+				'can_export'           => true,
+				'delete_with_user'     => false,
+				'template'             => array(),
 
 			)
 		);
 	}
 
-	public function make_meta_boxes( $post )
-	{
+	public function make_meta_boxes( $post ) {
 		wp_enqueue_style( 'issue',
 			$this->core->url . 'assets/css/issue.css',
 			[],
@@ -103,9 +119,6 @@ class Issue {
 			[],
 			$this->core->version );
 
-		//TODO scaffolding.
-		$data = array ('sessions' => 'Parliament 2022|Parliament 2024|BC Legislative Assembly 2024|TODO',
-                       'parties' => 'Conservatives|Libertarians|Liberals|Greens|Whigs|No Labels|TO DO' );
 		add_meta_box(
 			'issue',
 			__( 'This issue', 'personal-opinion-tracker' ),
@@ -113,59 +126,120 @@ class Issue {
 			null,
 			'normal', /* advanced|normal|side */
 			'high',
-			$data
+			null
 		);
 
 		remove_meta_box( 'generate_layout_options_meta_box', null, 'side' );
 	}
 
-	public function issue_meta_box( $post, $callback_args ) 	{
-		$sessions = explode('|', $callback_args['args']['sessions']);
-		$parties = explode('|', $callback_args['args']['parties']);
-
+	public function issue_meta_box( $post, $callback_args ) {
+		$sessions       = Session::enumerate();
+		$session_choice = get_post_meta( $post->ID, $this->core->slug . '-session', true );
+		$parties        = Party::enumerate();
+		$supports       = array();
+		$opposes        = array();
+		foreach ( $parties as $slug => $name ) {
+			$support = get_post_meta( $post->ID, $this->core->slug . '-supports-' . $slug, true );
+			if ( '' !== $support ) {
+				$supports [ $slug ] = $support;
+			}
+			$oppose = get_post_meta( $post->ID, $this->core->slug . '-opposes-' . $slug, true );
+			if ( '' !== $oppose ) {
+				$opposes [ $slug ] = $oppose;
+			}
+		}
 		?>
-		<table class="issue">
-
-			<tr>
-				<td>
-					<label for="session"><?php esc_html_e( 'Session', 'personal-opinion-tracker' ) ?></label>
-				</td>
-				<td>
-					<select id="session" name="session">
+        <table class="issue">
+            <tr>
+                <td>
+                    <label for="session"><?php esc_html_e( 'Session', 'personal-opinion-tracker' ) ?></label>
+                </td>
+                <td colspan="3">
+                    <select id="session" name="session">
 						<?php
-                        echo '<option value="">&mdash;' . esc_html__('Choose a session', 'personal-opinion-tracker') . '&mdash;</option>' . PHP_EOL;
-						foreach ($sessions as $session) {
-							echo '<option value = "' . esc_attr( $session ) . '">' . esc_html( $session ) . '</option>' . PHP_EOL;
+						$selected = '' === $session_choice ? 'selected' : '';
+						echo '<option value="" ' . $selected . '>&mdash;' . esc_html__( 'Choose a session', 'personal-opinion-tracker' ) . '&mdash;</option>' . PHP_EOL;
+						foreach ( $sessions as $slug => $name ) {
+							$selected = $slug === $session_choice ? 'selected' : '';
+							echo '<option value = "' . esc_attr( $slug ) . '" ' . $selected . '>' . esc_html( $name ) . '</option>' . PHP_EOL;
 						}
 						?>
-					</select>
-				</td>
-			</tr>
-            <tr>
-                <td>
-                    <label for="supporters"><?php esc_html_e( 'Supporters', 'personal-opinion-tracker' ) ?></label>
-                </td>
-                <td id="supporters">
-                    <?php
-						foreach ($parties as $party) {
-							echo '<input type="checkbox" name="supporters[]" value = "' . esc_attr( $party ) . '">' . esc_html( $party ) . '</input><br>' . PHP_EOL;
-						}
-						?>
+                    </select>
                 </td>
             </tr>
-            <tr>
-                <td>
-                    <label for="opponents"><?php esc_html_e( 'Opponents', 'personal-opinion-tracker' ) ?></label>
-                </td>
-                <td id="opponents">
-					<?php
-					foreach ($parties as $party) {
-						echo '<input type="checkbox" name="opponents[]" value = "' . esc_attr( $party ) . '">' . esc_html( $party ) . '</input><br>' . PHP_EOL;
-					}
-					?>
-                </td>
+            <tr class="header">
+				<?php
+				echo '<td class="center">' . esc_html( 'Party', 'personal-opinion-tracker' ) . '</td>' . PHP_EOL;
+				echo '<td class="center">' . esc_html( 'Supports', 'personal-opinion-tracker' ) . '</td>' . PHP_EOL;
+				echo '<td class="center">' . esc_html( 'Opposes', 'personal-opinion-tracker' ) . '</td>' . PHP_EOL;
+				?>
+                <td></td>
             </tr>
+			<?php
+			foreach ( $parties as $slug => $name ) {
+				echo '<tr>';
+				echo '<td>' . esc_html( $name ) . '</td>';
+
+				$checked = array_key_exists( $slug, $supports ) ? 'checked' : '';
+				echo '<td class="center"><input type="checkbox" name="supports[]" value = "' . esc_attr( $slug ) . '"' . $checked . '/></td>' . PHP_EOL;
+				$checked = array_key_exists( $slug, $opposes ) ? 'checked' : '';
+				echo '<td class="center"><input type="checkbox" name="opposes[]" value = "' . esc_attr( $slug ) . '"' . $checked . '/></td>' . PHP_EOL;
+				echo '<td></td></tr>' . PHP_EOL;
+			}
+			?>
         </table>
 		<?php
+	}
+
+	/**
+	 * Fires once a post has been saved.
+	 *
+	 * The dynamic portion of the hook name, `$post->post_type`, refers to
+	 * the post type slug.
+	 *
+	 * @param int $profile_id Post ID.
+	 * @param WP_Post $post Post object.
+	 *
+	 * @since 3.7.0
+	 *
+	 */
+
+	public function save_metadata( $post_id, $post ) {
+
+		if ( isset ( $_POST['action'] ) && 'editpost' !== $_POST['action'] ) {
+			return;
+		}
+		if ( self::$slug !== $post->post_type ) {
+			return;
+		}
+		if ( ! $post_id ) {
+			return;
+		}
+		$session = array_key_exists( 'session', $_POST ) ? $_POST['session'] : null;
+		if ( null === $session ) {
+			delete_post_meta( $post_id, $this->core->slug . '-session' );
+		} else {
+			update_post_meta( $post_id, $this->core->slug . '-session', $session );
+		}
+
+		foreach ( array( 'supports', 'opposes' ) as $action ) {
+			$parties = array();
+			if ( array_key_exists( $action, $_POST ) && is_array( $_POST[ $action ] ) ) {
+				$items = $_POST[ $action ];
+				foreach ( $items as $item ) {
+					$parties[ $item ] = 1;
+				}
+			}
+			$names = array_merge( Party::enumerate(), $parties );
+			foreach ( $names as $slug => $name ) {
+				if ( array_key_exists( $slug, $parties ) ) {
+					update_post_meta( $post_id, $this->core->slug . '-' . $action . '-' . $slug, 1 );
+				} else {
+					delete_post_meta( $post_id, $this->core->slug . '-' . $action . '-' . $slug );
+				}
+			}
+		}
+
+
 	}
 }

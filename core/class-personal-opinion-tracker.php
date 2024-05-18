@@ -105,6 +105,10 @@ class Personal_Opinion_Tracker {
 	 */
 	private function public() {
 
+		require_once $this->base . 'core/class-shortcode.php';
+		new Shortcode( $this );
+
+
 	}
 
 	/**

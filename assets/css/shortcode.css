@@ -1,0 +1,25 @@
+div.personal_opinion_widget {
+    border: 1px solid black;
+    background: #f0f0f0;
+    border-radius:0.25em;
+}
+
+div.personal_opinion_widget div.head p {
+    border-bottom: 1px solid black;
+    font-size: 95%;
+    text-align: center;
+    padding: 0.1em;
+    margin: 0.1em;
+}
+div.personal_opinion_widget div.head p.caption {
+     font-weight: 600;
+ }
+div.personal_opinion_widget div.votes {
+    display: flex;
+    justify-content: center;
+}
+div.personal_opinion_widget div.votes div {
+    padding: 0.2em;
+    margin: 0.2em;
+
+}

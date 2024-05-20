@@ -25,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'PERSONAL_OPINION_TRACKER_VERSION', '0.0.1' );
+define( 'PERSONAL_OPINION_TRACKER_VERSION', '0.0.2' );
 
 function activate() {
 	$path = trailingslashit( plugin_dir_path( __FILE__ ) );

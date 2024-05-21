@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const res = await fetch(req)
     target.disabled = false
     if (res.status === 200) {
-      const reply = await res.json();
+      await res.json();
     }
 
   }
@@ -50,16 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
     checkbox.addEventListener('change', async (e) => {
       const target = e.target
       if (target.checked) {
-        target
-          .parentElement
-          .parentElement
-          .querySelectorAll("input[type='checkbox']")
-          .forEach(siblingCheckbox => {
-            if (checkbox !== siblingCheckbox) {
-              siblingCheckbox.checked = false
-              vote_server({target: siblingCheckbox}).then();
-            }
-          })
+        const checkboxes = target.parentElement.parentElement.querySelectorAll("input[type='checkbox']")
+        for (const siblingCheckbox of checkboxes) {
+          if (checkbox !== siblingCheckbox) {
+            siblingCheckbox.checked = false
+            await vote_server({target: siblingCheckbox})
+          }
+        }
       }
     })
 

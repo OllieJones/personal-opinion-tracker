@@ -33,8 +33,8 @@
     public function __construct( $core ) {
       $this->core = $core;
 
-      add_filter( 'manage_' . self::$slug . '_posts_columns', [ $this, 'manage_post_columns' ] );
-      add_action( 'manage_' . self::$slug . '_posts_custom_column', [ $this, 'manage_post_custom_column' ], 10, 2 );
+      add_filter( 'manage_' . self::$slug . '_posts_columns', [ $this, 'manage_posts_columns' ] );
+      add_action( 'manage_' . self::$slug . '_posts_custom_column', [ $this, 'manage_posts_custom_column' ], 10, 2 );
 
       add_action( 'init', [ $this, 'register_post_type' ] );
       add_action( 'edit_post' . '_' . self::$slug, [ $this, 'save_metadata' ], 10, 2 );
@@ -245,7 +245,7 @@
       }
     }
 
-    public function manage_post_columns( $columns ) {
+    public function manage_posts_columns( $columns ) {
       wp_enqueue_style( 'issue',
         $this->core->url . 'assets/css/issue.css',
         [],
@@ -267,10 +267,17 @@
       return $result;
     }
 
+
     /**
+     *  Emits the content for a [custom column](https://developer.wordpress.org/reference/hooks/manage_posts_custom_column/).
+     *
+     * @param string $column The name of the column.
+     * @param int $post_id The post ID of the current row's post.
+     *
+     * @return void
      * @throws Exception
      */
-    public function manage_post_custom_column( $column, $post_id ) {
+    public function manage_posts_custom_column( $column, $post_id ) {
       switch ( $column ) {
         case 'shortcode' :
           $post = get_post( $post_id );

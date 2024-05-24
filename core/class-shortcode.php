@@ -81,9 +81,9 @@
           </div>
           <div class="votes">
             <?php echo $this->render_checkbox( 'supports', $issue, $votes ) ?>
-            <div><?php echo esc_html( $atts['support_text'] ) ?></div>
-            <div class="spacer"></div>
-            <div><?php echo esc_html( $atts['oppose_text'] ) ?></div>
+            <div class="txt"><?php echo esc_html( $atts['support_text'] ) ?></div>
+            <div class="txt spacer"></div>
+            <div class="txt"><?php echo esc_html( $atts['oppose_text'] ) ?></div>
             <?php echo $this->render_checkbox( 'opposes', $issue, $votes ) ?>
           </div>
         </div>
@@ -94,15 +94,36 @@
     }
 
     private function render_checkbox( $action, $issue, $votes ): string {
+      /* dashicons: check and x. */
+      $glyph = array ('supports' => '&#xf147;', 'opposes' => '&#xf158;');
+      $classes = [ 'checkbox', $action ];
+      $checked = false;
+      if ( array_key_exists( $action, $votes ) && is_numeric( $votes[ $action ] ) && $votes[ $action ] > 0 ) {
+        $classes[] = 'checked';
+        $checked = true;
+      }
+      $classlist = implode( ' ', $classes );
+
+      $datas      = array(
+        'name'   => $issue->post_name,
+        'action' => $action,
+        'user'   => get_current_user_id(),
+        'url'    => '/wp-json/personal-opinion-tracker/v1/vote',
+        'checked' => $glyph[$action]
+      );
+      $datastring = '';
+      foreach ( $datas as $key => $data ) {
+        $datastring .= 'data-' . $key . '="' . esc_attr( $data ) . '" ';
+      }
+
       $result = '<div class="check ';
       $result .= esc_attr( $action );
-      $result .= '"><input type="checkbox" ';
-      $result .= array_key_exists( $action, $votes ) && is_numeric( $votes[ $action ] ) && $votes[ $action ] > 0 ? 'checked' : '';
-      $result .= ' data-name="' . esc_attr( $issue->post_name ) . '" ';
-      $result .= ' data-action="' . esc_attr( $action ) . '" ';
-      $result .= ' data-endpoint="' . site_url( '/wp-json/personal-opinion-tracker/v1/vote' ) .'"';
-      $result .= ' data-user="' . esc_attr( get_current_user_id() ) . '" ';
-      $result .= '/></div>';
+      $result .= '"' . $datastring . '>';
+
+      $result .= '<div class="' . $classlist . '">';
+      $result .= $checked ? $glyph[$action] : '';
+      $result .= '</div>';
+      $result .= '</div>';
 
       return $result;
 

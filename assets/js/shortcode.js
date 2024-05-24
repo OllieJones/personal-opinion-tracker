@@ -3,10 +3,35 @@ document.addEventListener('DOMContentLoaded', () => {
   const nonce_element = document.getElementById('postnonce')
   const nonce = nonce_element ? nonce_element.value : ''
 
-  const vote_server = async (e) => {
-    const target = e.target
-    const endpoint = target.dataset.endpoint
-    const checked = target.checked ? 'checked' : 'unchecked'
+  const getstate = async (target) => {
+    const glyph = target.children[0]
+    return glyph.classList.contains('checked');
+  }
+  const togglestate = async (target) => {
+    const checked = await getstate(target)
+    await setstate(!checked, target);
+    return !checked;
+  }
+  const setstate = async (checked, target) => {
+    const current = await getstate(target);
+    if (current !== checked) {
+      const glyph = target.children[0]
+      if (checked) {
+        target.classList.add('checked')
+        glyph.classList.add('checked')
+        glyph.innerText = target.dataset.checked
+      } else {
+        target.classList.remove('checked')
+        glyph.classList.remove('checked')
+        glyph.innerText = ''
+      }
+      await vote_server(checked, target);
+    }
+    return current;
+  }
+  const vote_server = async (state, target) => {
+    const endpoint = target.dataset.url
+    const checked = state ? 'checked' : 'unchecked'
     const body = JSON.stringify({
       action: target.dataset.action,
       name: target.dataset.name,
@@ -35,30 +60,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
   }
-  /* Make checkboxes embedded in rows of tables work like radio buttons. */
-  const checkboxes = document.querySelectorAll("div.personal_opinion_widget div.votes input[type='checkbox']")
-  checkboxes.forEach(checkbox => {
-    /**
-     * Push the change to the server API
-     */
-    checkbox.addEventListener('change', vote_server)
 
+  const checkdivs = document.querySelectorAll("div.personal_opinion_widget div.votes > div.check")
+  for (const checkdiv of checkdivs) {
 
     /**
      * When checking one box, clear its sibling.
      */
-    checkbox.addEventListener('change', async (e) => {
-      const target = e.target
-      if (target.checked) {
-        const checkboxes = target.parentElement.parentElement.querySelectorAll("input[type='checkbox']")
-        for (const siblingCheckbox of checkboxes) {
-          if (checkbox !== siblingCheckbox) {
-            siblingCheckbox.checked = false
-            await vote_server({target: siblingCheckbox})
+    checkdiv.addEventListener('click', async (e) => {
+      const target = e.currentTarget;
+      const checked = await togglestate(target)
+      if (checked) {
+        const otherdivs = target.parentElement.parentElement.querySelectorAll("div.votes > div.check")
+        for (const otherdiv of otherdivs) {
+          if (checkdiv !== otherdiv) {
+            await setstate(false, otherdiv)
           }
         }
       }
     })
+  }
 
-  })
 })

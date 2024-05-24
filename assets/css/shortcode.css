@@ -1,7 +1,7 @@
 div.personal_opinion_widget {
     border: 1px solid black;
     background: #f0f0f0;
-    border-radius:0.25em;
+    border-radius: 0.5em;
 }
 
 div.personal_opinion_widget div.head p {
@@ -11,15 +11,45 @@ div.personal_opinion_widget div.head p {
     padding: 0.1em;
     margin: 0.1em;
 }
+
 div.personal_opinion_widget div.head p.caption {
-     font-weight: 600;
- }
+    font-weight: 600;
+}
+
 div.personal_opinion_widget div.votes {
     display: flex;
     justify-content: center;
+    align-items: center;
 }
-div.personal_opinion_widget div.votes div {
+
+div.personal_opinion_widget div.votes div.txt {
     padding: 0.2em;
     margin: 0.2em;
 
 }
+
+div.votes div.check {
+    position: relative;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+}
+div.votes div.check.supports {
+    border: 0.10em solid green;
+    color: green;
+}
+div.votes div.check.opposes {
+    border: 0.10em solid red;
+    color: red;
+}
+
+div.votes div.check div.checkbox {
+    font-family: dashicons;
+    font-size: 50px;
+    text-decoration: none;
+    position: absolute;
+    transform: translate(-15%, -25%);
+}
+

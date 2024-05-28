@@ -11,7 +11,11 @@
     private Personal_Opinion_Tracker $core;
     public static string $slug = 'opinion-issue';
 
-    public static function enumerate() {
+    /**
+     * Retrieve a list of the available items of this type: post_name => post_title
+     * @return array
+     */
+    public static function enumerate(): array {
       $result = array();
       global $post;
       $args  = array(
@@ -84,7 +88,7 @@
           'hierarchical'         => false,
           'public'               => true, //TODO not sure how these visibility parameters interact.
           'exclude_from_search'  => true,
-          'publicly_queryable'   => false,
+          'publicly_queryable'   => true, // Enables the editor for the slug (post_name).
           'show_ui'              => true,
           'show_in_menu'         => true, //TODO change this to put ui in submenu
           'show_in_nav_menus'    => false,

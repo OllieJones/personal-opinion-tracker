@@ -79,6 +79,9 @@
             <p class="caption"><?php echo esc_html( $atts['title'] ) ?></p>
             <p class="issue"><?php echo esc_html( $issue->post_title ) ?></p>
           </div>
+          <?php
+          if ( 0 !== get_current_user_id()) {
+          ?>
           <div class="votes">
             <?php echo $this->render_checkbox( 'supports', $issue, $votes ) ?>
             <div class="txt"><?php echo esc_html( $atts['support_text'] ) ?></div>
@@ -86,6 +89,17 @@
             <div class="txt"><?php echo esc_html( $atts['oppose_text'] ) ?></div>
             <?php echo $this->render_checkbox( 'opposes', $issue, $votes ) ?>
           </div>
+            <?php
+          } else {
+            ?>
+            <div class="votes notloggedin">
+              <p>
+                <?php esc_html_e('Please log in register your opinion.', 'personal-opinion-tracker') ?>
+              </p>
+              <?php
+                }
+              ?>
+            </div>
         </div>
       </div>
       <?php

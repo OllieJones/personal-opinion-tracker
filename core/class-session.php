@@ -86,7 +86,7 @@ class Session {
 				'hierarchical'         => false,
 				'public'               => true, //TODO not sure how these visibility parameters interact.
 				'exclude_from_search'  => true,
-				'publicly_queryable'   => false,
+				'publicly_queryable'   => true,
 				'show_ui'              => true,
 				'show_in_menu'         => true, //TODO change this to put ui in submenu
 				'show_in_nav_menus'    => false,
@@ -95,12 +95,14 @@ class Session {
 				'menu_position'        => 42,
 				'menu_icon'            => 'dashicons-bank',
 				'map_meta_cap'         => true,
-				'supports'             => array(
+				'supports'             => array(    //‘title’, ‘editor’, ‘comments’, ‘revisions’, ‘trackbacks’, ‘author’, ‘excerpt’, ‘page-attributes’, ‘thumbnail’, ‘custom-fields’, and ‘post-formats’.
 					'title',
 					'editor',
 					'revisions',
 					'author',
+          'excerpt',
 					'custom_fields',
+          'page-attributes',
 				),
 				'register_meta_box_cb' => [ $this, 'make_meta_boxes' ],
 				'has_archive'          => true,

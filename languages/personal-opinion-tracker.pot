@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Personal Opinion Tracker 0.0.2\n"
+"Project-Id-Version: Personal Opinion Tracker 0.0.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/personal-opinion-tracker\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-05-21T08:16:14-04:00\n"
+"POT-Creation-Date: 2024-05-28T17:34:49-04:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: personal-opinion-tracker\n"
@@ -34,125 +34,125 @@ msgstr ""
 msgid "https://https://profiles.wordpress.org/olliejones//"
 msgstr ""
 
-#: core/class-issue.php:56
+#: core/class-issue.php:60
 msgid "Issue"
 msgstr ""
 
-#: core/class-issue.php:57
+#: core/class-issue.php:61
 msgid "Issues"
 msgstr ""
 
-#: core/class-issue.php:59
+#: core/class-issue.php:63
 msgctxt "post type menu name"
 msgid "Issues"
 msgstr ""
 
-#: core/class-issue.php:60
+#: core/class-issue.php:64
 msgctxt "post type general name"
 msgid "Issues"
 msgstr ""
 
-#: core/class-issue.php:61
+#: core/class-issue.php:65
 msgctxt "post type singular name"
 msgid "Issue"
 msgstr ""
 
-#: core/class-issue.php:62
+#: core/class-issue.php:66
 #: core/class-session.php:63
 msgctxt "issue"
 msgid "Add New"
 msgstr ""
 
-#: core/class-issue.php:63
+#: core/class-issue.php:67
 msgid "Add new issue"
 msgstr ""
 
-#: core/class-issue.php:64
+#: core/class-issue.php:68
 msgid "New issue"
 msgstr ""
 
-#: core/class-issue.php:65
+#: core/class-issue.php:69
 msgid "Edit issue"
 msgstr ""
 
-#: core/class-issue.php:66
+#: core/class-issue.php:70
 msgid "View issue"
 msgstr ""
 
-#: core/class-issue.php:67
+#: core/class-issue.php:71
 msgid "All issues"
 msgstr ""
 
-#: core/class-issue.php:68
+#: core/class-issue.php:72
 msgid "Search issues"
 msgstr ""
 
-#: core/class-issue.php:69
+#: core/class-issue.php:73
 msgid "No issues found. Create one."
 msgstr ""
 
-#: core/class-issue.php:70
+#: core/class-issue.php:74
 msgid "No issues found in Trash."
 msgstr ""
 
-#: core/class-issue.php:71
+#: core/class-issue.php:75
 msgid "Archive of issues"
 msgstr ""
 
-#: core/class-issue.php:72
+#: core/class-issue.php:76
 msgid "Insert into issu"
 msgstr ""
 
-#: core/class-issue.php:73
+#: core/class-issue.php:77
 msgid "Uploaded to this issue"
 msgstr ""
 
-#: core/class-issue.php:74
+#: core/class-issue.php:78
 msgid "Filter issues list"
 msgstr ""
 
-#: core/class-issue.php:75
+#: core/class-issue.php:79
 msgid "Issue list navigation"
 msgstr ""
 
-#: core/class-issue.php:76
+#: core/class-issue.php:80
 msgid "Issue list"
 msgstr ""
 
-#: core/class-issue.php:77
+#: core/class-issue.php:81
 msgid "Issue published"
 msgstr ""
 
-#: core/class-issue.php:78
+#: core/class-issue.php:82
 msgid "Private issue activated"
 msgstr ""
 
-#: core/class-issue.php:79
+#: core/class-issue.php:83
 msgid "Issuue deactivated"
 msgstr ""
 
-#: core/class-issue.php:80
+#: core/class-issue.php:84
 msgid "Issue scheduled for activation"
 msgstr ""
 
-#: core/class-issue.php:81
+#: core/class-issue.php:85
 msgid "Issue updated"
 msgstr ""
 
-#: core/class-issue.php:128
+#: core/class-issue.php:132
 msgid "This issue"
 msgstr ""
 
-#: core/class-issue.php:159
+#: core/class-issue.php:163
 #: core/class-session.php:57
 msgid "Session"
 msgstr ""
 
-#: core/class-issue.php:165
+#: core/class-issue.php:169
 msgid "Choose a session"
 msgstr ""
 
-#: core/class-issue.php:262
+#: core/class-issue.php:266
 msgid "Shortcode"
 msgstr ""
 
@@ -359,23 +359,23 @@ msgstr ""
 msgid "Session updated"
 msgstr ""
 
-#: core/class-session.php:129
+#: core/class-session.php:131
 msgid "(Historical)"
 msgstr ""
 
-#: core/class-session.php:145
+#: core/class-session.php:147
 msgid "This session"
 msgstr ""
 
-#: core/class-session.php:161
+#: core/class-session.php:163
 msgid "This session is"
 msgstr ""
 
-#: core/class-session.php:167
+#: core/class-session.php:169
 msgid "Active"
 msgstr ""
 
-#: core/class-session.php:169
+#: core/class-session.php:171
 msgid "Historical"
 msgstr ""
 

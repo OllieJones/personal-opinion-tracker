@@ -78,7 +78,7 @@ class Party {
 				'hierarchical' => false,
 				'public' => true, //TODO not sure how these visibility parameters interact.
 				'exclude_from_search' => true,
-				'publicly_queryable' => false,
+				'publicly_queryable' => true,
 				'show_ui' => true,
 				'show_in_menu' => true, //TODO change this to put ui in submenu
 				'show_in_nav_menus' => false,

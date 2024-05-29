@@ -3,10 +3,12 @@
   namespace Personal_Opinion_Tracker;
 
   use Exception;
+  use WP_Post;
   use WP_Query;
 
   class Shortcode {
 
+    public static string $shortcode = 'personal-opinion';
     public $core;
 
     private bool $nonce_sent = false;
@@ -17,8 +19,42 @@
       add_action( 'init', [ $this, 'init' ] );
     }
 
+    public static function shortcode_atts ( $atts ): array {
+      return shortcode_atts( array(
+        'class'        => self::$shortcode,
+        'id'           => '',
+        'i'            => null,
+        'iss'          => null,
+        'issueid'      => null,
+        'iid'          => null,
+        'title'        => __( 'Your Opinion Please', 'personal-opinion-tracker' ),
+        'support_text' => __( 'Support', 'personal-opinion-tracker' ),
+        'oppose_text'  => __( 'Oppose', 'personal-opinion-tracker' ),
+      ), $atts );
+    }
+
+    /**
+     * @param $atts
+     *
+     * @return WP_Post|null
+     */
+    public static function get_issue ( $atts ): ?WP_Post {
+      $issue_name = $atts['i'];
+      $issue_id   = $atts['iid'];
+      $issue      = null;
+
+      if ( ! is_numeric( $issue_id ) ) {
+        /* look up issue by name (slug) */
+        $issue_id = self::lookup( $issue_name );
+      }
+      if ( is_numeric( $issue_id ) ) {
+        $issue = get_post( $issue_id );
+      }
+      return $issue;
+    }
+
     public function init() {
-      add_shortcode( 'personal-opinion', [ $this, 'shortcode' ] );
+      add_shortcode( self::$shortcode, [ $this, 'shortcode' ] );
     }
 
     public function shortcode( $atts, $content, $shortcode_tag ) {
@@ -31,26 +67,11 @@
         [],
         $this->core->version );
       try {
-        $atts = shortcode_atts( array(
-          'class'        => 'personal-opinion',
-          'id'           => '',
-          'i'            => null,
-          'iss'          => null,
-          'issueid'      => null,
-          'iid'          => null,
-          'title'        => __( 'Your Opinion Please', 'personal-opinion-tracker' ),
-          'support_text' => __( 'Support', 'personal-opinion-tracker' ),
-          'oppose_text'  => __( 'Oppose', 'personal-opinion-tracker' ),
-        ), $atts );
-
-        $issue_name = $atts['i'];
-        $issue_id   = $atts['iid'];
-
-        if ( ! is_numeric( $issue_id ) ) {
-          /* look up issue by name (slug) */
-          $issue_id = $this->lookup( $issue_name );
+        $atts = self::shortcode_atts( $atts );
+        $issue = self::get_issue( $atts );
+        if ( null === $issue) {
+          return '';
         }
-        $issue = get_post( $issue_id );
 
         $issue_name = $issue->post_name;
         $votes      = $this->get_votes( $issue_name );
@@ -80,26 +101,26 @@
             <p class="issue"><?php echo esc_html( $issue->post_title ) ?></p>
           </div>
           <?php
-          if ( 0 !== get_current_user_id()) {
-          ?>
-          <div class="votes">
-            <?php echo $this->render_checkbox( 'supports', $issue, $votes ) ?>
-            <div class="txt"><?php echo esc_html( $atts['support_text'] ) ?></div>
-            <div class="txt spacer"></div>
-            <div class="txt"><?php echo esc_html( $atts['oppose_text'] ) ?></div>
-            <?php echo $this->render_checkbox( 'opposes', $issue, $votes ) ?>
-          </div>
+            if ( 0 !== get_current_user_id() ) {
+            ?>
+            <div class="votes">
+              <?php echo $this->render_checkbox( 'supports', $issue, $votes ) ?>
+              <div class="txt"><?php echo esc_html( $atts['support_text'] ) ?></div>
+              <div class="txt spacer"></div>
+              <div class="txt"><?php echo esc_html( $atts['oppose_text'] ) ?></div>
+              <?php echo $this->render_checkbox( 'opposes', $issue, $votes ) ?>
+            </div>
             <?php
           } else {
+          ?>
+          <div class="votes notloggedin">
+            <p>
+              <?php esc_html_e( 'Please log in register your opinion.', 'personal-opinion-tracker' ) ?>
+            </p>
+          </div>
+            <?php
+              }
             ?>
-            <div class="votes notloggedin">
-              <p>
-                <?php esc_html_e('Please log in register your opinion.', 'personal-opinion-tracker') ?>
-              </p>
-              <?php
-                }
-              ?>
-            </div>
         </div>
       </div>
       <?php
@@ -109,21 +130,21 @@
 
     private function render_checkbox( $action, $issue, $votes ): string {
       /* dashicons: check and x. */
-      $glyph = array ('supports' => '&#xf147;', 'opposes' => '&#xf158;');
+      $glyph   = array( 'supports' => '&#xf147;', 'opposes' => '&#xf158;' );
       $classes = [ 'checkbox', $action ];
       $checked = false;
       if ( array_key_exists( $action, $votes ) && is_numeric( $votes[ $action ] ) && $votes[ $action ] > 0 ) {
         $classes[] = 'checked';
-        $checked = true;
+        $checked   = true;
       }
       $classlist = implode( ' ', $classes );
 
       $datas      = array(
-        'name'   => $issue->post_name,
-        'action' => $action,
-        'user'   => get_current_user_id(),
-        'url'    => '/wp-json/personal-opinion-tracker/v1/vote',
-        'checked' => $glyph[$action]
+        'name'    => $issue->post_name,
+        'action'  => $action,
+        'user'    => get_current_user_id(),
+        'url'     => '/wp-json/personal-opinion-tracker/v1/vote',
+        'checked' => $glyph[ $action ]
       );
       $datastring = '';
       foreach ( $datas as $key => $data ) {
@@ -135,7 +156,7 @@
       $result .= '"' . $datastring . '>';
 
       $result .= '<div class="' . $classlist . '">';
-      $result .= $checked ? $glyph[$action] : '';
+      $result .= $checked ? $glyph[ $action ] : '';
       $result .= '</div>';
       $result .= '</div>';
 
@@ -192,8 +213,7 @@
       }
     }
 
-
-    private function lookup( $name, $post_type = 'opinion-issue' ): int {
+    private static function lookup( $name, $post_type = 'opinion-issue' ): ?int {
       $result = null;
       global $post;
       $args  = array(
@@ -209,8 +229,5 @@
       wp_reset_postdata();
 
       return $result;
-
     }
-
-
   }

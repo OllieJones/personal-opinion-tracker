@@ -42,7 +42,7 @@
 
       add_action( 'init', [ $this, 'register_post_type' ] );
       add_action( 'edit_post' . '_' . self::$slug, [ $this, 'save_metadata' ], 10, 2 );
-
+      add_filter( 'save_post', [ $this, 'save_post' ], 10, 3 );
     }
 
     /**
@@ -244,6 +244,46 @@
             update_post_meta( $post_id, $this->core->slug . '-' . $action . '-' . $slug, 1 );
           } else {
             delete_post_meta( $post_id, $this->core->slug . '-' . $action . '-' . $slug );
+          }
+        }
+      }
+    }
+
+    /**
+     * Intercept the saving of post objects, then look for our shortcode.
+     * If the shortcode exists, make sure the corresponding Issue object exists.
+     * If it doesn't create it.
+     *
+     * This lets authors insert shortcodes like [personal-opinion i="C-987"] and get the Issue
+     * created automatically.
+     *
+     * @param int $post_id
+     * @param WP_Post $post
+     * @param bool $update
+     *
+     * @return void
+     */
+    public function save_post( $post_id, $post, $update ) {
+      $re = get_shortcode_regex( array( 'personal-opinion' ) );
+      if ( preg_match_all( '/' . $re . '/s', $post->post_content, $matches )
+           && array_key_exists( 2, $matches ) ) {
+
+        if ( in_array( 'personal-opinion', $matches[2] ) ) {
+          $atts  = shortcode_parse_atts( $matches[3][0] );
+          $atts  = Shortcode::shortcode_atts( $atts );
+          $issue = Shortcode::get_issue( $atts );
+          if ( null === $issue ) {
+            /* Create a new issue matching the shortcode. */
+            $issue = array(
+              'post_title'   => $atts['i'],
+              'post_name'    => $atts['i'],
+              'post_content' => __( 'Automatically created for', 'personal_opinion_tracker' ) . ' ' . $post->post_title,
+              'post_type'    => self::$slug,
+              'post_status'  => 'publish',
+              'post_author'  => get_current_user_id(),
+            );
+
+            wp_insert_post( $issue );
           }
         }
       }

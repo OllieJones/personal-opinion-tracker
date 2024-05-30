@@ -9,7 +9,7 @@
  * Plugin Name:       Personal Opinion Tracker
  * Plugin URI:        https://github.com/OllieJones/personal-opinion-tracker
  * Description:       Citizen tool to keep track of proposed legislation.
- * Version:           0.0.5
+ * Version:           0.0.6
  * Author:            Oliver Jones
  * Author URI:        https://https://profiles.wordpress.org/olliejones//
  * License:           GPL-2.0+
@@ -25,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'PERSONAL_OPINION_TRACKER_VERSION', '0.0.5' );
+define( 'PERSONAL_OPINION_TRACKER_VERSION', '0.0.6' );
 
 function activate() {
 	$path = trailingslashit( plugin_dir_path( __FILE__ ) );

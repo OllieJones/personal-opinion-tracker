@@ -263,33 +263,39 @@
      *
      * @return void
      */
-    public function save_post( $post_id, $post, $update ) {
-      $re = get_shortcode_regex( array( 'personal-opinion' ) );
+    public function save_post( int $post_id, WP_Post $post, bool $update ) {
+        if ( ! $update ) {
+          return;
+        }
+        $re = get_shortcode_regex( array( 'personal-opinion' ) );
       if ( preg_match_all( '/' . $re . '/s', $post->post_content, $matches )
            && array_key_exists( 2, $matches ) ) {
 
         if ( in_array( 'personal-opinion', $matches[2] ) ) {
-          $atts  = shortcode_parse_atts( $matches[3][0] );
-          $atts  = Shortcode::shortcode_atts( $atts );
-          $issue = Shortcode::get_issue( $atts );
-          if ( null === $issue ) {
-            /* Create a new issue matching the shortcode. */
-            $issue = array(
-              'post_title'   => $atts['i'],
-              'post_name'    => $atts['i'],
-              'post_content' => __( 'Automatically created for', 'personal_opinion_tracker' ) . ' ' . $post->post_title,
-              'post_type'    => self::$slug,
-              'post_status'  => 'publish',
-              'post_author'  => get_current_user_id(),
-            );
+          $atts_array = $matches[3];
+          foreach ( $atts_array as $atts_string ) {
+            $atts  = shortcode_parse_atts( $atts_string );
+            $atts  = Shortcode::shortcode_atts( $atts );
+            $issue = Shortcode::get_issue( $atts );
+            if ( null === $issue ) {
+              /* Create a new issue matching the shortcode. */
+              $issue = array(
+                'post_title'   => $atts['i'],
+                'post_name'    => $atts['i'],
+                'post_content' => __( 'Automatically created for', 'personal_opinion_tracker' ) . ' ' . $post->post_title,
+                'post_type'    => self::$slug,
+                'post_status'  => 'publish',
+                'post_author'  => get_current_user_id(),
+              );
 
-            wp_insert_post( $issue );
+              wp_insert_post( $issue );
+            }
           }
         }
       }
     }
 
-    public function manage_posts_columns( $columns ) {
+    public function manage_posts_columns( $columns ): array {
       wp_enqueue_style( 'issue',
         $this->core->url . 'assets/css/issue.css',
         [],

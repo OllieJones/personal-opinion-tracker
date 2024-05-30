@@ -30,6 +30,9 @@ div.personal_opinion_widget div.votes div.txt {
     padding: 0.2em;
     margin: 0.2em;
 }
+div.personal_opinion_widget div.head .issue .meta-text {
+    font-size:80%;
+}
 
 div.votes div.check {
     position: relative;

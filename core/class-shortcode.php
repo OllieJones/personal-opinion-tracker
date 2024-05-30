@@ -19,7 +19,7 @@
       add_action( 'init', [ $this, 'init' ] );
     }
 
-    public static function shortcode_atts ( $atts ): array {
+    public static function shortcode_atts( $atts ): array {
       return shortcode_atts( array(
         'class'        => self::$shortcode,
         'id'           => '',
@@ -38,7 +38,7 @@
      *
      * @return WP_Post|null
      */
-    public static function get_issue ( $atts ): ?WP_Post {
+    public static function get_issue( $atts ): ?WP_Post {
       $issue_name = $atts['i'];
       $issue_id   = $atts['iid'];
       $issue      = null;
@@ -50,6 +50,7 @@
       if ( is_numeric( $issue_id ) ) {
         $issue = get_post( $issue_id );
       }
+
       return $issue;
     }
 
@@ -67,9 +68,9 @@
         [],
         $this->core->version );
       try {
-        $atts = self::shortcode_atts( $atts );
+        $atts  = self::shortcode_atts( $atts );
         $issue = self::get_issue( $atts );
-        if ( null === $issue) {
+        if ( null === $issue ) {
           return '';
         }
 
@@ -98,29 +99,39 @@
         <div class="inner">
           <div class="head">
             <p class="caption"><?php echo esc_html( $atts['title'] ) ?></p>
-            <p class="issue"><?php echo esc_html( $issue->post_title ) ?></p>
+            <p class="issue">
+              <?php
+                echo esc_html( $issue->post_title );
+                if ( 0 !== get_current_user_id() && current_user_can( 'edit_post', $issue->ID ) ) {
+                  echo ' <span class="meta-text"><a href="/wp-admin/post.php?action=edit&classic-editor&post=' . ( (int) $issue->ID ) . '">';
+
+                  esc_html_e( 'Edit', 'personal-opinion-tracker' );
+                  echo '</a></span>';
+                }
+              ?>
+            </p>
           </div>
           <?php
             if ( 0 !== get_current_user_id() ) {
-            ?>
-            <div class="votes">
-              <?php echo $this->render_checkbox( 'supports', $issue, $votes ) ?>
-              <div class="txt"><?php echo esc_html( $atts['support_text'] ) ?></div>
-              <div class="txt spacer"></div>
-              <div class="txt"><?php echo esc_html( $atts['oppose_text'] ) ?></div>
-              <?php echo $this->render_checkbox( 'opposes', $issue, $votes ) ?>
-            </div>
-            <?php
-          } else {
+              ?>
+              <div class="votes">
+                <?php echo $this->render_checkbox( 'supports', $issue, $votes ) ?>
+                <div class="txt"><?php echo esc_html( $atts['support_text'] ) ?></div>
+                <div class="txt spacer"></div>
+                <div class="txt"><?php echo esc_html( $atts['oppose_text'] ) ?></div>
+                <?php echo $this->render_checkbox( 'opposes', $issue, $votes ) ?>
+              </div>
+              <?php
+            } else {
+              ?>
+              <div class="votes notloggedin">
+                <p>
+                  <?php esc_html_e( 'Please log in register your opinion.', 'personal-opinion-tracker' ) ?>
+                </p>
+              </div>
+              <?php
+            }
           ?>
-          <div class="votes notloggedin">
-            <p>
-              <?php esc_html_e( 'Please log in register your opinion.', 'personal-opinion-tracker' ) ?>
-            </p>
-          </div>
-            <?php
-              }
-            ?>
         </div>
       </div>
       <?php
